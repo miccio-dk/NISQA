@@ -1438,6 +1438,23 @@ def predict_mos(model, ds, bs, dev, num_workers=0):
     ds.df['mos_pred'] = y_hat.astype(dtype=float)
     return y_hat, y
 
+def export_dim(model, ds):
+    x, y, (idx, n_wins) = ds[0]
+    x = x.unsqueeze(0)
+    x.requires_grad = True
+    n_wins = torch.from_numpy(n_wins).unsqueeze(0)
+    #n_wins.requires_grad = True
+    model.eval()
+    torch.onnx.export(model,                   # model being run
+                    (x, n_wins),               # model input (or a tuple for multiple inputs)
+                    "nisqa.onnx",              # where to save the model (can be a file or file-like object)
+                    export_params=True,        # store the trained parameter weights inside the model file
+                    opset_version=14,          # the ONNX version to export the model to
+                    do_constant_folding=True,  # whether to execute constant folding for optimization
+    )
+    print('Done')
+
+
 def predict_dim(model, ds, bs, dev, num_workers=0):     
     '''
     predict_dim: predicts MOS and dimensions of the given dataset with given 
@@ -1452,7 +1469,7 @@ def predict_dim(model, ds, bs, dev, num_workers=0):
     model.to(dev)
     model.eval()
     with torch.no_grad():
-        y_hat_list = [ [model(xb.to(dev), n_wins.to(dev)).cpu().numpy(), yb.cpu().numpy()] for xb, yb, (idx, n_wins) in dl]
+        y_hat_list = [ [model(xb.to(dev), n_wins.to(dev)).cpu().numpy(), yb.cpu().numpy()] for xb, yb, (idx, n_wins) in tqdm(dl)]
     yy = np.concatenate( y_hat_list, axis=1 )
     
     y_hat = yy[0,:,:]

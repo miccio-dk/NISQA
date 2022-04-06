@@ -80,6 +80,11 @@ class nisqaModel(object):
         print(self.ds_val.df.to_string(index=False))
         return self.ds_val.df
 
+    def export(self, ):
+        NL.export_dim(
+                self.model, 
+                self.ds_val)
+
     def _train_mos(self):
         '''
         Trains speech quality model.

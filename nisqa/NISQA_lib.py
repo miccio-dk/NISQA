@@ -1445,13 +1445,19 @@ def export_dim(model, ds):
     n_wins = torch.from_numpy(n_wins).unsqueeze(0)
     #n_wins.requires_grad = True
     model.eval()
-    torch.onnx.export(model,                   # model being run
-                    (x, n_wins),               # model input (or a tuple for multiple inputs)
-                    "nisqa.onnx",              # where to save the model (can be a file or file-like object)
-                    export_params=True,        # store the trained parameter weights inside the model file
-                    opset_version=14,          # the ONNX version to export the model to
-                    do_constant_folding=True,  # whether to execute constant folding for optimization
-    )
+    with torch.no_grad():
+        torch.onnx.export(model,                   # model being run
+                        (x, n_wins),               # model input (or a tuple for multiple inputs)
+                        "nisqa.onnx",              # where to save the model (can be a file or file-like object)
+                        export_params=True,        # store the trained parameter weights inside the model file
+                        opset_version=14,          # the ONNX version to export the model to
+                        do_constant_folding=True,  # whether to execute constant folding for optimization
+                        input_names=['data', 'n_wins'],
+                        output_names=['output'],
+                        dynamic_axes={
+                            'data':[0, 3],
+                            'n_wins':[0],
+                            'output':[0]})
     print('Done')
 
 

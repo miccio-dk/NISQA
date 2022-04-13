@@ -1,17 +1,19 @@
-name: nisqa1101
+name: nisqa1110
 channels:
   - pytorch
   - conda-forge
   - defaults
 dependencies:
-  - cudatoolkit=10.2.89
+  - cudatoolkit=10.2
   - libsndfile=1.0.31
   - pillow=8.4.0
   - pip=21.3.1
   - python=3.9.9
-  - pytorch=1.10.1
+  - pytorch=1.11
   - scipy=1.7.3
-  - torchvision=0.11.2
+  - torchvision
+  - onnx
+  - onnxruntime
   - pip:
     - librosa==0.8.1
     - matplotlib==3.5.1
